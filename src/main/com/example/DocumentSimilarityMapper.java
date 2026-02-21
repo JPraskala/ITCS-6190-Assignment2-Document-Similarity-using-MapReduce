@@ -4,10 +4,13 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.IntWritable;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.HashSet;
 
 public class DocumentSimilarityMapper extends Mapper<Object, Text, Text, IntWritable>  {
-    private Text text = new Text();
+    private Text textKey = new Text();
+    private Text textValue = new Text();
     private final IntWritable one = new IntWritable(1);
 
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
@@ -21,13 +24,18 @@ public class DocumentSimilarityMapper extends Mapper<Object, Text, Text, IntWrit
         String id = parts[0];
         String content = parts[1];
 
+        Set<String> uniqueWords = new HashSet<>();
+
         StringTokenizer tokenizer = new StringTokenizer(content);
 
         while (tokenizer.hasMoreTokens()) {
-            String term = tokenizer.nextToken().toLowerCase(); // The toLowerCase is to avoid any case sensitivity 
+            uniqueWords.add(tokenizer.nextToken().toLowerCase());
+        }
 
-            text.set(term + "@" + id);
-            context.write(text, one);
+        for (String word : uniqueWords) {
+            textKey.set(word);
+            textValue.set(id);
+            context.write(textKey, textValue);
         }
     }
 }
