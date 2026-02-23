@@ -15,14 +15,20 @@ public class DocumentSimilarityDriver {
     public static void main(String[] args) {
         Configuration conf = new Configuration();
         Job job = Job.getInstance(conf, "Document Similarity");
-        job.setJarByClass(Controller.class);
+        
+        job.setJarByClass(DocumentSimilarityDriver.class);
         job.setMapperClass(DocumentSimilarityMapper.class);
-        job.setCombinerClass(DocumentSimilarityReducer.class);
         job.setReducerClass(DocumentSimilarityReducer.class);
+
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(Text.class);
+
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(DoubleWritable.class);
+
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
+
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 }
