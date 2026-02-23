@@ -9,7 +9,7 @@
 ### Mapper Design
 [Explain the logic of your Mapper class. What is its input key-value pair? What does it emit as its output key-value pair? How does it help in solving the overall problem?]
 
-The Mapper class takes the input file and prepares all the building blocks needed to calculate the Jaccard Similarity in the Reducer class. The input takes an Object as its key and a String as its value; the key is the id of the document, such as Document1, while the value is the content of the document. In the map method, the line is split into two parts; these two parts are the key-value input pair mentioned before. Once it is split, the StringTokenizer class is used to break the line content into individual words, often referred to as terms. In the loop, we check if there are any tokens to process, and if so, we take the current word and convert it to lowercase to avoid case sensitivity. The mapper then produces an output for the Reducer to use for the Jaccard Similarity. The output contains Text as its key and an integer as its value. The key is a special key the mapper creates that the reducer will use to make the calculations; for example, this@document1 can be a key. The integer value is a constant always containing the value 1, which specifies the frequency in that document. It will always be 1 because we are interested in seeing if the word exists in the document rather than how many times the word appears in the document. In terms of solving the overall problem, while the mapper doesn't perform the similarity calculations, it does the necessary preparation to help the Reducer perform the calculations. Without the Mapper, the Reducer cannot calculate the Jaccard Similarity nor the intersection and union of two sets (needed for Jaccard Similarity).
+The Mapper class takes the input file and prepares all the building blocks needed to calculate the Jaccard Similarity in the Reducer class. Its input key-value pair is an Object containing the key, such as Document1, and a Text object containing one or more words. In the map function, for any lines that are not blank, the Mapper splits the line into two parts, with the first containing the key and the second part containing the content. The content part is then passed into a StringTokenizer object because StringTokenizer breaks up a piece of text into individual words or tokens, making it easy for the Mapper to read. After gathering the unique words into a set of Strings, the context variable then calls the write function, which is the output key-value pair. The output key-value pair are both Text objects with the key containing all distinct words, and the value containing the document id. The reason the output is setup this way is because of the way Hadoop shuffles the data; it shuffles it in a way that makes it easy for the Reducer to calculate the Jaccard Similarity. If it were to be flipped, you would get all the words in a document, but it would not tell you which documents share a word.
 
 
 ### Reducer Design
@@ -143,3 +143,15 @@ Document3 Sample text with different words
 "Document2, Document3 Similarity: 0.50"
 ```
 ## Obtained Output: (Place your obtained output here.)
+```
+Document5, Document4 Similarity: 	0.5
+Document5, Document3 Similarity: 	0.0
+Document5, Document2 Similarity: 	0.0
+Document5, Document1 Similarity: 	0.0
+Document4, Document3 Similarity: 	0.0
+Document4, Document2 Similarity: 	0.0
+Document4, Document1 Similarity: 	0.0
+Document3, Document2 Similarity: 	0.33
+Document3, Document1 Similarity: 	0.67
+Document2, Document1 Similarity: 	0.67
+```
