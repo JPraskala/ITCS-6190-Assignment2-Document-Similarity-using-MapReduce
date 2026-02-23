@@ -1,0 +1,5 @@
+Document1 cat dog mouse 
+Document2 cat dog 
+Document3 dog mouse 
+Document4 car bus train 
+Document5 car train plane
