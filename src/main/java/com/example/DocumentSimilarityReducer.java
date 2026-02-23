@@ -11,12 +11,11 @@ public class DocumentSimilarityReducer extends Reducer<Text, Text, Text, DoubleW
 
     public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 
-        Set<String> words = new HashSet<>();
-
-        for (Text value : values)
-            words.add(value.toString());
-
-        wordMap.put(key.toString(), words);
+        for (Text value : values) {
+            String documentId = value.toString();
+            wordMap.putIfAbsent(documentId, new HashSet<>());
+            wordMap.get(documentId).add(key.toString());
+        }
 
     }
 
