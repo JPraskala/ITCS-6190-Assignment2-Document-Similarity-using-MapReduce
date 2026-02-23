@@ -40,7 +40,7 @@ public class DocumentSimilarityReducer extends Reducer<Text, Text, Text, DoubleW
                 double jaccardSimilarity = (double) intersection.size() / union.size();
                 jaccardSimilarity = Math.round(jaccardSimilarity * 100.0) / 100.0;
 
-                String outputStr = doucments.get(i) + ", " + documents.get(j) + " Similarity:";
+                String outputStr = doucments.get(i) + ", " + documents.get(j) + " Similarity: ";
                 context.write(new Text(outputStr), new DoubleWritable(jaccardSimilarity));
             }
     }
