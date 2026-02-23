@@ -12,7 +12,7 @@ import com.example.DocumentSimilarityReducer;
 
 public class DocumentSimilarityDriver {
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
         Job job = Job.getInstance(conf, "Document Similarity");
         

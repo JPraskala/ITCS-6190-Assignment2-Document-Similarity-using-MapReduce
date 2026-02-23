@@ -34,13 +34,13 @@ public class DocumentSimilarityReducer extends Reducer<Text, Text, Text, DoubleW
 
                 // The Union is calculated here.
                 Set<String> union = new HashSet<>(aDocumentWords);
-                union.AddAll(bDocumentWords);
+                union.addAll(bDocumentWords);
 
                 // Calculate the Jaccard Similarity and round to 2 decimal places.
                 double jaccardSimilarity = (double) intersection.size() / union.size();
                 jaccardSimilarity = Math.round(jaccardSimilarity * 100.0) / 100.0;
 
-                String outputStr = doucments.get(i) + ", " + documents.get(j) + " Similarity: ";
+                String outputStr = documents.get(i) + ", " + documents.get(j) + " Similarity: ";
                 context.write(new Text(outputStr), new DoubleWritable(jaccardSimilarity));
             }
     }

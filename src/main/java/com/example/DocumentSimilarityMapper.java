@@ -1,17 +1,15 @@
 package com.example;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.IntWritable;
 
 import java.io.IOException;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.HashSet;
 
-public class DocumentSimilarityMapper extends Mapper<Object, Text, Text, IntWritable>  {
+public class DocumentSimilarityMapper extends Mapper<Object, Text, Text, Text>  {
     private Text textKey = new Text();
     private Text textValue = new Text();
-    private final IntWritable one = new IntWritable(1);
 
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
         String line = value.toString().trim();
