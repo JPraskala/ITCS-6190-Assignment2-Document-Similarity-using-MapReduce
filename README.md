@@ -15,18 +15,18 @@ The Mapper class takes the input file and prepares all the building blocks neede
 ### Reducer Design
 [Explain the logic of your Reducer class. What is its input key-value pair? How does it process the values for a given key? What does it emit as the final output? How do you calculate the Jaccard Similarity here?]
 
-The Reducer class calculates the Jaccard Similarity itself. Its input key-value pairs are both Text Objects, which were created from the Mapper class. In global memory, a Map is created with a String as the key and a set of Strings as the value. In the reduce method, it loops through all the values and passes it into the Map; it does this by adding the value to the Map as a key if it doesn't exist, and it adds the key parameter variable as the value in the Map. By formatting the Map this way, it will hold the information about which documents the word exists in. For example, docA -> [word1, word2] could be an entry in the Map. 
+The Reducer class calculates the Jaccard Similarity itself. Its input key-value pairs are both Text Objects, which were created from the Mapper class. In global memory, a Map is created with a String as the key and a set of Strings as the value. In the reduce method, it loops through all the values and passes them into the Map; it does this by adding the value to the Map as a key if it doesn't exist, and it adds the key parameter variable as the value in the Map. By formatting the Map this way, it will hold the information about which documents the word exists in. For example, docA -> [word1, word2] could be an entry in the Map. 
 
-In the cleanup method, the keyset in the map is first passed into an ArrayList of type String for easy access, and then the Collections.sort method is called on the ArrayList so documents 1 and 2 are processed first. After the method is called, two loops are created. Inside these loops, two sets of type String are created, containing the words in document A and the other in document B. The program first calculates the intersection by creating another set containing the words from document A, and then calling the retainAll method to get words from document B that are also in document A. Calculating the union is similar, except the addAll method is called, which adds all the words from document B into the union set. 
+In the cleanup method, the keyset in the map is first passed into an ArrayList of type String for easy access, and then the **Collections.sort** method is called on the ArrayList, so documents 1 and 2 are processed first. After the method is called, two loops are created. Inside these loops, two sets of type String are created, containing the words in document A and the other in document B. The program first calculates the intersection by creating another set containing the words from document A, and then calling the **retainAll** method to get words from document B that are also in document A. Calculating the union is similar, except the **addAll** method is called, which adds all the words from document B into the union set. 
 
-The Jaccard Similarity is then calculated by taking the size of the intersection set and dividing it by the size of the union set. To round the answer to 2 decimal places, I took the result, multiplied it by 100, and then divided it by 100. The reason I did it this way is that Java's round function always rounds to the nearest whole number; it does not allow the programmer to specify how many decimal places to round to like Python's round function does. Because of this, the way I did it is the easiest way to ensure the answer is rounded to 2 decimal places in Java. Lastly, the context variable then calls the write function by passing a Text Object as the key containing the formatting in the output file, and the value is of type DoubleWritable.   
+The Jaccard Similarity is then calculated by taking the size of the intersection set and dividing it by the size of the union set.  Lastly, the context variable then calls the write function by passing a Text Object as the key containing the formatting in the output file, and the value is of type Text, which contains the Jaccard Similarity value rounded to 2 decimal places using the **String.format** method. The reason why the value has the type Text instead of DoubleWritable is that for my answers, I want to ensure there are always 2 decimal places. For example, I want 0.5 to be displayed as 0.50 in the output file. If I were to use DoubleWritable, I would not get 0.50, but if I set the value to be a Text and round the result to 2 decimal places using the String.format method as mentioned earlier, I can get my desired output.
 
 ### Overall Data Flow
 [Describe how data flows from the initial input files, through the Mapper, shuffle/sort phase, and the Reducer to produce the final output.]
 
 In this MapReduce Document Similarity Analysis, the Driver controls the flow of the program as it contains the main method. In the Driver, I created a Configuration Object and then a Job Object specifying the configuration variable and the name of the job, which, in my case, I named "Document Similarity". After setting the classes, map output key/values, and the set output key/values, the program then reads from the input file, which resides in the shared-folder directory inside the input directory. The input file is called small_dataset.txt, which contains 5 documents and some basic words.
 
-The text in the input file is then processed by the Mapper, which splits each line or document into 2 parts as specified before. Once the Mapper performs its computations and outputs the necessary format, the Reducer then takes the output from the Mapper and uses it to calculate the Jaccard Similarity for the final output. The shuffle/sort phase is divided into two parts. The first part is in the Mapper, which builds an inverted index with the word as the key and the documents in which the word is present as the values. The second part is in the Reducer class, which uses a Map to store the document id as the key and the words the document contains as the values. When executed, the output tells the user which documents were compared and how similar they are. For example, ```Document5, Document4 Similarity:  0.5``` says document 4 and document 5 are 50% similar to each other. Additionally, ```Document4, Document3 Similarity:  0.0``` says documents 4 and 3 are not similar whatsoever. 
+The text in the input file is then processed by the Mapper, which splits each line or document into 2 parts as specified before. Once the Mapper performs its computations and outputs the necessary format, the Reducer then takes the output from the Mapper and uses it to calculate the Jaccard Similarity for the final output. The shuffle/sort phase is divided into two parts. The first part is in the Mapper, which builds an inverted index with the word as the key and the documents in which the word is present as the values. The second part is in the Reducer class, which uses a Map to store the document id as the key and the words the document contains as the values. The Reducer also calls the **Collections.Sort** method in the cleanup method so that the documents are processed in ascending order. When executed, the output tells the user which documents were compared and how similar they are. For example, ```Document4, Document5 Similarity: 0.50``` says document 4 and document 5 are 50% similar to each other. Additionally, ```Document3, Document4 Similarity: 0.00``` says documents 4 and 3 are not similar whatsoever. 
 
 
 ---
@@ -159,15 +159,16 @@ Document3 Sample text with different words
 ```
 ## Obtained Output: (Place your obtained output here.)
 ```
-Document1, Document2 Similarity:	0.67
-Document1, Document3 Similarity:	0.67
-Document1, Document4 Similarity:	0.0
-Document1, Document5 Similarity:	0.0
-Document2, Document3 Similarity:	0.33
-Document2, Document4 Similarity:	0.0
-Document2, Document5 Similarity:	0.0
-Document3, Document4 Similarity:	0.0
-Document3, Document5 Similarity:	0.0
-Document4, Document5 Similarity:	0.5
+Document1, Document2 Similarity: 0.67
+Document1, Document3 Similarity: 0.67
+Document1, Document4 Similarity: 0.00
+Document1, Document5 Similarity: 0.00
+Document2, Document3 Similarity: 0.33
+Document2, Document4 Similarity: 0.00
+Document2, Document5 Similarity: 0.00
+Document3, Document4 Similarity: 0.00
+Document3, Document5 Similarity: 0.00
+Document4, Document5 Similarity: 0.50
+
 
 ```
