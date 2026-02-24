@@ -136,6 +136,10 @@ To copy the output from HDFS to your local machine:
 
 [Describe any challenges you faced during this assignment. This could be related to the algorithm design (e.g., how to generate pairs), implementation details (e.g., data structures, debugging in Hadoop), or environmental issues. Explain how you overcame these challenges.]
 
+During this assignment, the biggest challenge I faced was understanding the MapReduce data flow. When I started the assignment, I was not entirely sure how the Mapper and the Reducer work. I initially thought the Mapper would calculate the Jaccard Similairity, but I later found out the Reducer is supposed to handle that calculation. I figured it out by using the Hands-On assignment as a guide on how to structure my files and using internet resources to learn more about how MapReduce works and what is expected in each function. I believe this assignment helped me gain a fundamental knowledge on MapReduce, and if I even run into a situation where I need to use it, I will be a lot more comfortable implementing it compared to before. 
+
+The second and final issue I faced was executing the program itself on the command line. I was able to create the Docker Container, but I could not execute my MapReduce job and it puzzled me for a significant amount of time. What I discovered was the src directory was lacking the java folder which caused the problem of the Docker command line not finding any of my classes. After creating a java directory inside src, I was able to successfully execute the MapReduce job and get my output. 
+
 ---
 ## Sample Input
 
