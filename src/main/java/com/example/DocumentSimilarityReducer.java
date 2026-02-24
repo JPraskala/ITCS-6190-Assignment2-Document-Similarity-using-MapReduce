@@ -2,11 +2,10 @@ package com.example;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.DoubleWritable;
 import java.io.IOException;
 import java.util.*;
 
-public class DocumentSimilarityReducer extends Reducer<Text, Text, Text, DoubleWritable> {
+public class DocumentSimilarityReducer extends Reducer<Text, Text, Text, Text> {
     private Map<String, Set<String>> wordMap = new HashMap<>();
 
     public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
@@ -38,10 +37,9 @@ public class DocumentSimilarityReducer extends Reducer<Text, Text, Text, DoubleW
 
                 // Calculate the Jaccard Similarity and round to 2 decimal places.
                 double jaccardSimilarity = (double) intersection.size() / union.size();
-                jaccardSimilarity = Math.round(jaccardSimilarity * 100.0) / 100.0;
 
                 String outputStr = documents.get(i) + ", " + documents.get(j) + " Similarity:";
-                context.write(new Text(outputStr), new DoubleWritable(jaccardSimilarity));
+                context.write(new Text(outputStr), new Text(String.format("%.2f", jaccardSimilarity)));
             }
     }
 }
