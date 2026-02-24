@@ -17,16 +17,16 @@ The Mapper class takes the input file and prepares all the building blocks neede
 
 The Reducer class calculates the Jaccard Similarity itself. Its input key-value pairs are both Text Objects, which were created from the Mapper class. In global memory, a Map is created with a String as the key and a set of Strings as the value. In the reduce method, it loops through all the values and passes it into the Map; it does this by adding the value to the Map as a key if it doesn't exist, and it adds the key parameter variable as the value in the Map. By formatting the Map this way, it will hold the information about which documents the word exists in. For example, docA -> [word1, word2] could be an entry in the Map. 
 
-In the cleanup method, the keyset in the map is first passed into an ArrayList of type String for easy access, and then, two loops are created. Inside these loops, two sets of type String are created, containing the words in document A and the other in document B. The program first calculates the intersection by creating another set containing the words from document A, and then calling the retainAll method to get words from document B that are also in document A. Calculating the union is similar, except the addAll method is called, which adds all the words from document B into the union set. 
+In the cleanup method, the keyset in the map is first passed into an ArrayList of type String for easy access, and then the Collections.sort method is called on the ArrayList so documents 1 and 2 are processed first. After the method is called, two loops are created. Inside these loops, two sets of type String are created, containing the words in document A and the other in document B. The program first calculates the intersection by creating another set containing the words from document A, and then calling the retainAll method to get words from document B that are also in document A. Calculating the union is similar, except the addAll method is called, which adds all the words from document B into the union set. 
 
 The Jaccard Similarity is then calculated by taking the size of the intersection set and dividing it by the size of the union set. To round the answer to 2 decimal places, I took the result, multiplied it by 100, and then divided it by 100. The reason I did it this way is that Java's round function always rounds to the nearest whole number; it does not allow the programmer to specify how many decimal places to round to like Python's round function does. Because of this, the way I did it is the easiest way to ensure the answer is rounded to 2 decimal places in Java. Lastly, the context variable then calls the write function by passing a Text Object as the key containing the formatting in the output file, and the value is of type DoubleWritable.   
 
 ### Overall Data Flow
 [Describe how data flows from the initial input files, through the Mapper, shuffle/sort phase, and the Reducer to produce the final output.]
 
-In this MapReduce Document Similarity Analysis, the Driver controls the flow of the program as it contains the main method. In the Driver, I created a Configuration Object and then a Job Object specifying the configuration variable and the name of the job which in my case, I named "Document Similarity". After setting the classes, map output key/values, and the set output key/values, the program then reads from the input file which resides in the shared-folder directory inside the input directory. The input file is called small_dataset.txt which contains 5 documents and some basic words.
+In this MapReduce Document Similarity Analysis, the Driver controls the flow of the program as it contains the main method. In the Driver, I created a Configuration Object and then a Job Object specifying the configuration variable and the name of the job, which, in my case, I named "Document Similarity". After setting the classes, map output key/values, and the set output key/values, the program then reads from the input file, which resides in the shared-folder directory inside the input directory. The input file is called small_dataset.txt, which contains 5 documents and some basic words.
 
-The text in the input file is then processed by the Mapper which splits each line or document into 2 parts as specified before. Once the Mapper performs its computations and outputs the necessary format, the Reducer then takes the output from the Mapper and uses it to calculate the Jaccard Similarity for the final output. The shuffle/sort phase is divided into two parts. The first part is in the Mapper which builds an inverted index with the word as the key and the documents the word is present in as the values. The second part is in the Reducer class which uses a Map to store the document id as the key and the words the document contains as the values. When executed, the output tells the user which documents were compared and how similar they are. For example, ```Document5, Document4 Similarity: 	0.5``` says document 4 and document 5 are 50% similar to each other. Additionally, ```Document4, Document3 Similarity: 	0.0``` says documents 4 and 3 are not similar whatsoever. 
+The text in the input file is then processed by the Mapper, which splits each line or document into 2 parts as specified before. Once the Mapper performs its computations and outputs the necessary format, the Reducer then takes the output from the Mapper and uses it to calculate the Jaccard Similarity for the final output. The shuffle/sort phase is divided into two parts. The first part is in the Mapper, which builds an inverted index with the word as the key and the documents in which the word is present as the values. The second part is in the Reducer class, which uses a Map to store the document id as the key and the words the document contains as the values. When executed, the output tells the user which documents were compared and how similar they are. For example, ```Document5, Document4 Similarity:  0.5``` says document 4 and document 5 are 50% similar to each other. Additionally, ```Document4, Document3 Similarity:  0.0``` says documents 4 and 3 are not similar whatsoever. 
 
 
 ---
@@ -136,9 +136,9 @@ To copy the output from HDFS to your local machine:
 
 [Describe any challenges you faced during this assignment. This could be related to the algorithm design (e.g., how to generate pairs), implementation details (e.g., data structures, debugging in Hadoop), or environmental issues. Explain how you overcame these challenges.]
 
-During this assignment, the biggest challenge I faced was understanding the MapReduce data flow. When I started the assignment, I was not entirely sure how the Mapper and the Reducer work. I initially thought the Mapper would calculate the Jaccard Similairity, but I later found out the Reducer is supposed to handle that calculation. I figured it out by using the Hands-On assignment as a guide on how to structure my files and using internet resources to learn more about how MapReduce works and what is expected in each function. I believe this assignment helped me gain a fundamental knowledge on MapReduce, and if I even run into a situation where I need to use it, I will be a lot more comfortable implementing it compared to before. 
+During this assignment, the biggest challenge I faced was understanding the MapReduce data flow. When I started the assignment, I was not entirely sure how the Mapper and the Reducer work. I initially thought the Mapper would calculate the Jaccard Similarity, but I later found out the Reducer is supposed to handle that calculation. I figured it out by using the Hands-On assignment as a guide on how to structure my files and using internet resources to learn more about how MapReduce works and what is expected in each function. I believe this assignment helped me gain a fundamental knowledge of MapReduce. If I encounter a situation where I need to use it, I will be a lot more comfortable implementing it compared to before. 
 
-The second and final issue I faced was executing the program itself on the command line. I was able to create the Docker Container, but I could not execute my MapReduce job and it puzzled me for a significant amount of time. What I discovered was the src directory was lacking the java folder which caused the problem of the Docker command line not finding any of my classes. After creating a java directory inside src, I was able to successfully execute the MapReduce job and get my output. 
+The second and final issue I faced was executing the program itself on the command line. I was able to create the Docker Container, but I could not execute my MapReduce job, and it puzzled me for a significant amount of time. What I discovered was that the src directory was lacking the java folder, which caused the problem of the Docker command line not finding any of my classes. After creating a Java directory inside the src, I was able to successfully execute the MapReduce job and get my output. 
 
 ---
 ## Sample Input
@@ -159,14 +159,15 @@ Document3 Sample text with different words
 ```
 ## Obtained Output: (Place your obtained output here.)
 ```
-Document5, Document4 Similarity: 	0.5
-Document5, Document3 Similarity: 	0.0
-Document5, Document2 Similarity: 	0.0
-Document5, Document1 Similarity: 	0.0
-Document4, Document3 Similarity: 	0.0
-Document4, Document2 Similarity: 	0.0
-Document4, Document1 Similarity: 	0.0
-Document3, Document2 Similarity: 	0.33
-Document3, Document1 Similarity: 	0.67
-Document2, Document1 Similarity: 	0.67
+Document1, Document2 Similarity:	0.67
+Document1, Document3 Similarity:	0.67
+Document1, Document4 Similarity:	0.0
+Document1, Document5 Similarity:	0.0
+Document2, Document3 Similarity:	0.33
+Document2, Document4 Similarity:	0.0
+Document2, Document5 Similarity:	0.0
+Document3, Document4 Similarity:	0.0
+Document3, Document5 Similarity:	0.0
+Document4, Document5 Similarity:	0.5
+
 ```
