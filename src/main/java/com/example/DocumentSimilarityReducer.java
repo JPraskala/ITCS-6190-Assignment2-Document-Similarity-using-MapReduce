@@ -21,6 +21,7 @@ public class DocumentSimilarityReducer extends Reducer<Text, Text, Text, DoubleW
 
     protected void cleanup(Context context) throws IOException, InterruptedException {
         List<String> documents = new ArrayList<>(wordMap.keySet());
+        Collections.sort(documents);
         for (int i = 0; i < documents.size(); i++) 
             for (int j = i + 1; j < documents.size(); j++) {
                 // Here, two documents (A and B) will be put into a two sets. The sets will be used to calculate the Jaccard Similarity.
@@ -39,7 +40,7 @@ public class DocumentSimilarityReducer extends Reducer<Text, Text, Text, DoubleW
                 double jaccardSimilarity = (double) intersection.size() / union.size();
                 jaccardSimilarity = Math.round(jaccardSimilarity * 100.0) / 100.0;
 
-                String outputStr = documents.get(i) + ", " + documents.get(j) + " Similarity: ";
+                String outputStr = documents.get(i) + ", " + documents.get(j) + " Similarity:";
                 context.write(new Text(outputStr), new DoubleWritable(jaccardSimilarity));
             }
     }
